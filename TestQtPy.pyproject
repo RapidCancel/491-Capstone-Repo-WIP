@@ -1,0 +1,13 @@
+{
+    "files": [
+        "DBManager.py",
+        "adminSettings.py",
+        "app.py",
+        "login.py",
+        "main.py",
+        "mainWindow.py",
+        "save",
+        "reset.py",
+        "test.py"
+    ]
+}
