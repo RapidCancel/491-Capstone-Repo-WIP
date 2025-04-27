@@ -2,7 +2,8 @@ import sys
 from PySide6.QtWidgets import QApplication
 from login import LoginScreen
 from mainWindow import MainWindow
-from reset import EZResetWidget
+
+from reset import EZResetWidget     # Remove EZReset after
 
 def onLogin():
     mainWindow.show()
@@ -12,6 +13,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     loginScreen = LoginScreen(0)
     mainWindow = MainWindow()
+
     eZReset = EZResetWidget()
     eZReset.show()
 
