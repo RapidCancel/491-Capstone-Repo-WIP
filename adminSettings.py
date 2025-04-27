@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QLineEdit, QLabel
+from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel
 from PySide6.QtCore import Qt, Signal, QTimer
-from PySide6.QtGui import QShortcut
+from PySide6.QtGui import QShortcut, QIcon
 from DBManager import DatabaseManager
 
 class AdminSettingsWindow(QWidget):
@@ -19,17 +19,16 @@ class AdminSettingsWindow(QWidget):
         self.password_input.setEchoMode(QLineEdit.Password)
 
         self.revealButton = QPushButton()    # Replace text with a picture of an eye or smthin
-        self.revealButton.setFixedSize(100, 100)     # width, height
+        self.revealButton.setFixedSize(30, 30)     # width, height
         # Apply stylesheet with an image
         self.revealButton.setStyleSheet("""
             QPushButton {
                 border: none;
-                border-image: url('simple_eye_transparent.jpg') 0 0 0 0 stretch stretch;
-            }
-            QPushButton:pressed {
-                opacity: 0.7;  /* Makes the button slightly transparent when clicked */
             }
         """)
+        self.revealButton.setIcon(QIcon("ui_elements/white_eye_graphic_transparent.png"))  # Replace with the image path
+        self.revealButton.setIconSize(self.revealButton.size())  # Scale image to match button size
+
         self.revealButton.pressed.connect(self.revealPassword)
         self.revealButton.released.connect(self.concealPassword)
 
@@ -39,13 +38,18 @@ class AdminSettingsWindow(QWidget):
         self.confirmShortcut = QShortcut(Qt.Key_Return, self)      # Return key shortcut for login
         self.confirmShortcut.activated.connect(self.confirmButton.clicked)
 
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Placeholder password suggestions here"))
-        layout.addWidget(self.username_input)
-        layout.addWidget(self.password_input)
-        layout.addWidget(self.confirmButton)
-        layout.addWidget(self.revealButton)
-        self.setLayout(layout)
+        vLayout = QVBoxLayout()     # Primary vertical layout
+        vLayout.addWidget(QLabel("Placeholder password suggestions here"))
+        vLayout.addWidget(self.username_input)
+
+        hLayout = QHBoxLayout()     # Secondary horizontal layout
+        hLayout.addWidget(self.password_input)
+        hLayout.addWidget(self.revealButton)
+
+        vLayout.addLayout(hLayout) # Horizontal layer added to primary layout
+
+        vLayout.addWidget(self.confirmButton)
+        self.setLayout(vLayout)
 
         self.DBManager = DatabaseManager("hashedCredentials.db")
 
