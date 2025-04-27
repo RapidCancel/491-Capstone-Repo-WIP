@@ -4,10 +4,14 @@
         "adminSettings.py",
         "app.py",
         "login.py",
-        "main.py",
         "mainWindow.py",
         "save",
         "reset.py",
-        "test.py"
+        "test.py",
+        "manualSaveTemplate.py",
+        "spreadsheetScheduleTemplate.py",
+        "test2.py",
+        "employeeTable.py",
+        "test3.py"
     ]
 }
