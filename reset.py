@@ -117,20 +117,23 @@ class EZResetWidget(QWidget):
         VALUES (1, 'Alice', '1234 N Address Ave', '6261234567', 'alice1@gmail.com', 'Manicure Pedicure Acrylic Gelx', 'Misc. Notes'),
         (2, 'Bob', '4321 S Address Ave', '6267654321', 'bob2@yahoo.com', 'Manicure Acrylic Waxing', '');
 
+        INSERT INTO jobRoles(roleID, roleName)
+        VALUES (0, 'Break');     -- "Break" roleID == 0
         INSERT INTO jobRoles (roleName)
         VALUES ('Manicure'), ('Pedicure'), ('Acrylic'), ('GelX'), ('Waxing');
 
         INSERT INTO employeeRoles (employeeID, roleID)
-        VALUES (1, 1), (1, 2), (1, 3), (1, 4), (2, 1), (2, 3), (2, 5);      -- Alice can do manicure, pedicure, acrylic, gelx
+        VALUES (1,0), (1, 1), (1, 2), (1, 3), (1, 4), (2, 0), (2, 1), (2, 3), (2, 5);   -- Alice can take break, manicure, pedicure, acrylic, gelx
 
         INSERT INTO commissions (employeeID, date, clientName, startTime, endTime, service)
         VALUES
-            (1, '2025-04-30', 'Cindy', '08:00:00', '12:00:00', 'Manicure'),
-            (2, '2025-04-30', 'Danielle', '10:00:00', '18:00:00', 'Pedicure'),
-            (1, '2025-04-30', 'Evelynn', '13:00:00', '17:00:00', 'Manicure GelX');
+            (1, '2025-04-30', 'Cindy', '08:00:00', '10:00:00', 'Manicure'),
+            (2, '2025-04-30', 'Danielle', '09:00:00', '10:00:00', 'Pedicure'),
+            (1, '2025-04-30', 'Evelynn', '11:00:00', '13:30:00', 'Manicure GelX'),
+            (2, '2025-04-30', 'Lunch', '11:00:00', '13:30:00', 'Break');
 
         INSERT INTO rolesForCommissions (commissionID, roleID)
-        VALUES (1, 1), (2, 2), (3, 1), (3, 4);  -- manicure, pedicure, then manicure and gelx
+        VALUES (1, 1), (2, 2), (3, 1), (3, 4), (4, 0);  -- manicure, pedicure, then manicure and gelx, break
 
         """
 
@@ -148,6 +151,3 @@ class EZResetWidget(QWidget):
             print(row)  # Simple row-by-row printing
 
         self.DBManager.conn.close()
-
-
-
