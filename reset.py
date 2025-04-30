@@ -24,19 +24,19 @@ class EZResetWidget(QWidget):
         layout.addWidget(button2)
 
         button3 = QPushButton("Print LoginDB")
-        button3.clicked.connect(lambda: self.printDB("hashedCredentials.db", "users"))
+        button3.clicked.connect(lambda: self.DBManager.printDBTable("users"))
         layout.addWidget(button3)
 
         button4 = QPushButton("Print Employees")
-        button4.clicked.connect(lambda: self.printDB("employeeSchedule.db", "employees"))
+        button4.clicked.connect(lambda: self.DBManager.printDBTable("employees", db_file = "employeeSchedule.db"))
         layout.addWidget(button4)
 
         button5 = QPushButton("Print Job Roles")
-        button5.clicked.connect(lambda: self.printDB("employeeSchedule.db", "jobRoles"))
+        button5.clicked.connect(lambda: self.DBManager.printDBTable("jobRoles", db_file = "employeeSchedule.db"))
         layout.addWidget(button5)
 
         button6 = QPushButton("Print Commissions")
-        button6.clicked.connect(lambda: self.printDB("employeeSchedule.db", "commissions"))
+        button6.clicked.connect(lambda: self.DBManager.printDBTable("commissions", db_file = "employeeSchedule.db"))
         layout.addWidget(button6)
 
         self.setLayout(layout)
@@ -127,10 +127,10 @@ class EZResetWidget(QWidget):
 
         INSERT INTO commissions (employeeID, date, clientName, startTime, endTime, service)
         VALUES
-            (1, '2025-04-30', 'Cindy', '08:00:00', '10:00:00', 'Manicure'),
-            (2, '2025-04-30', 'Danielle', '09:00:00', '10:00:00', 'Pedicure'),
-            (1, '2025-04-30', 'Evelynn', '11:00:00', '13:30:00', 'Manicure GelX'),
-            (2, '2025-04-30', 'Lunch', '11:00:00', '13:30:00', 'Break');
+            (1, '2025-04-30', 'Cindy', '08:00', '10:00', 'Manicure'),
+            (2, '2025-04-30', 'Danielle', '09:00', '10:00', 'Pedicure'),
+            (1, '2025-04-30', 'Evelynn', '11:00', '13:30', 'Manicure GelX'),
+            (2, '2025-04-30', 'Lunch', '11:00', '13:30', 'Break');
 
         INSERT INTO rolesForCommissions (commissionID, roleID)
         VALUES (1, 1), (2, 2), (3, 1), (3, 4), (4, 0);  -- manicure, pedicure, then manicure and gelx, break
@@ -141,13 +141,5 @@ class EZResetWidget(QWidget):
         self.DBManager.editDB(resetScript, db_file = "employeeSchedule.db", script = True)
         print("Reset employeeSchedule database triggered!")
 
-    def printDB(self, db_file, table_name):
-        self.DBManager.connectToDB(db_file)
 
-        self.DBManager.cursor.execute(f"SELECT * FROM {table_name}")
-        rows = self.DBManager.cursor.fetchall()
 
-        for row in rows:
-            print(row)  # Simple row-by-row printing
-
-        self.DBManager.conn.close()
