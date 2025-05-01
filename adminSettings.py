@@ -79,7 +79,6 @@ class AdminSettingsWindow(QWidget):
             QTimer.singleShot(1500, lambda: self.confirmButton.setText("Confirm")) #Timer on 1.25 seconds
             QTimer.singleShot(1500, lambda: self.confirmButton.setStyleSheet("background-color: #3C3C3C;"))
 
-            #self.close()  # Close window after saving
 
     def revealPassword(self):
         self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
