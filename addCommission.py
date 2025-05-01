@@ -34,11 +34,11 @@ class AddCommissionWidget(QWidget):
 
         # Start and end time selection
         self.start_time_edit = QTimeEdit()
-        self.start_time_edit.setDisplayFormat("HH:mm")
+        self.start_time_edit.setDisplayFormat("hh:mm AP")
         self.start_time_edit.setTime(QTime(8, 0))  # Default start time
 
         self.end_time_edit = QTimeEdit()
-        self.end_time_edit.setDisplayFormat("HH:mm")
+        self.end_time_edit.setDisplayFormat("hh:mm AP")
         self.end_time_edit.setTime(QTime(10, 0))  # Default end time
 
         form_layout.addRow("Start Time:", self.start_time_edit)
@@ -59,11 +59,12 @@ class AddCommissionWidget(QWidget):
         self.confirm_button.clicked.connect(self.saveCommission)
         self.setLayout(layout)
 
+
     def saveCommission(self):
         employeeName = self.employee_dropdown.currentText()
         clientName = self.client_name_input.text()
-        startTime = self.start_time_edit.time().toString("HH:mm")
-        endTime = self.end_time_edit.time().toString("HH:mm")
+        startTime = self.start_time_edit.time().toString("hh:mm AP")
+        endTime = self.end_time_edit.time().toString("hh:mm AP")
 
         # Issue with DBManager.connectToDB(), self.conn redeclared but not overwritten? Just connect manually
         conn = sqlite3.connect("employeeSchedule.db")
