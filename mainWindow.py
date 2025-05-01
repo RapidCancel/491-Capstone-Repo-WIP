@@ -2,12 +2,13 @@ from PySide6.QtWidgets import (
 QPushButton, QMainWindow, QStatusBar, QWidget, QVBoxLayout,
 QHBoxLayout, QTableWidget, QTableWidgetItem, QComboBox, QApplication, QMenu, QSizePolicy, QFrame
 )
-from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QIcon, QAction
+from PySide6.QtCore import Qt, QTimer, QTime, QDate, Signal
+from PySide6.QtGui import QIcon, QAction, QColor
 from login import LoginScreen
 from DBManager import DatabaseManager
 from adminSettings import AdminSettingsWindow
 from employeeTable import EmployeeTableWindow
+from addCommission import AddCommissionWidget
 from reset import EZResetWidget
 
 
@@ -37,13 +38,42 @@ class MainWindow(QMainWindow):
         self.mainWidget.setLayout(self.main_layout)
 
         # Horizontal layout UI stuff
-        secondary_layout = QHBoxLayout()
-        secondary_layout.setAlignment(Qt.AlignLeft)
+        self.secondary_layout = QHBoxLayout()
+        self.secondary_layout.setAlignment(Qt.AlignLeft)
         border_frame = QFrame()
         border_frame.setFrameShape(QFrame.Box)
         border_frame.setLineWidth(2)
 
-        # Create dropdown menu
+        # Stored in function for easier readability
+        self.createDropdownMenu()
+
+        # Create buttons
+        self.buttonOpenMenu = self.createButton("Options", self.displayDropdownMenu)
+        self.buttonEmployeeTable = self.createButton("View Employees", self.openEmployeeSpreadsheet)
+        self.buttonAddCommission = self.createButton("Add Commission", self.openCommissionWidget)
+        self.buttonPingSB = self.createButton("Ping Status Bar", self.pingStatusBar)
+
+        # Organize the horizontal layout with buttons at the top
+        #secondary_layout.addWidget(self.buttonOpenMenu)
+        #secondary_layout.addWidget(self.buttonEmployeeTable)
+        #secondary_layout.addWidget(self.buttonPingSB)
+        #secondary_layout.addWidget(border_frame)
+
+        # Create the initial table widget, connect the refresh signal
+        self.setupScheduleTable()
+        self.employeeTable.refreshSpreadsheet.connect(self.setupScheduleTable) # <--- Hi CoPilot! This Line here.
+
+        # Organize the main layout
+        self.main_layout.addLayout(self.secondary_layout)  # Dropdown and buttons on top
+        self.main_layout.addWidget(self.scheduleTable)  # Table below
+        self.mainWidget.setLayout(self.main_layout)
+
+        # Status bar
+        self.status_bar = QStatusBar(self)
+        self.setStatusBar(self.status_bar)
+        self.status_bar.showMessage("No status.")
+
+    def createDropdownMenu(self):
         self.menu = QMenu(self)
         self.changeLoginAction = QAction("Change Your Login", self)
         self.resetLoginAction = QAction("Reset Login DB", self)
@@ -58,31 +88,7 @@ class MainWindow(QMainWindow):
         self.resetLoginAction.triggered.connect(self.resetWidget.resetDatabase)
         self.resetEmployeeAction.triggered.connect(self.resetWidget.resetEmployeesDB)
 
-        # Create buttons
-        self.createButtons()    # Stored in function for easier readability
-
-        # Organize the horizontal layout with buttons at the top
-        secondary_layout.addWidget(self.buttonOpenMenu)
-        secondary_layout.addWidget(self.buttonEmployeeTable)
-        secondary_layout.addWidget(self.buttonPingSB)
-        secondary_layout.addWidget(border_frame)
-
-        # Create the initial table widget, connect the refresh signal
-        self.setupScheduleTable()
-        self.employeeTable.refreshSpreadsheet.connect(self.setupScheduleTable) # <--- Hi CoPilot! This Line here.
-
-        # Organize the main layout
-        self.main_layout.addLayout(secondary_layout)  # Dropdown and buttons on top
-        self.main_layout.addWidget(self.scheduleTable)  # Table below
-        self.mainWidget.setLayout(self.main_layout)
-
-        # Status bar
-        self.status_bar = QStatusBar(self)
-        self.setStatusBar(self.status_bar)
-        self.status_bar.showMessage("No status.")
-
-
-    def createButtons(self):
+    def createButton(self, buttonLabel, connectFunction):
         buttonStyleSettings = """
         QPushButton {
             border: none;
@@ -94,24 +100,13 @@ class MainWindow(QMainWindow):
             background-color: rgba(200, 200, 200, 50);  /* Light translucent hover effect */
         }
         """     # Script for button stylesheets, saves on lines
+        button = QPushButton(buttonLabel)
+        button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        button.setGeometry(0, 0, 115, 75)
+        button.setStyleSheet(buttonStyleSettings)
+        button.clicked.connect(connectFunction)
+        self.secondary_layout.addWidget(button)
 
-        self.buttonOpenMenu = QPushButton("Options")    # Opens the dropdown menu
-        self.buttonOpenMenu.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.buttonOpenMenu.setGeometry(0, 0, 115, 75)
-        self.buttonOpenMenu.setStyleSheet(buttonStyleSettings)
-        self.buttonOpenMenu.clicked.connect(self.displayDropdownMenu)
-
-        self.buttonEmployeeTable = QPushButton("View Employees")
-        self.buttonEmployeeTable.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.buttonEmployeeTable.setGeometry(0, 0, 115, 75)
-        self.buttonEmployeeTable.setStyleSheet(buttonStyleSettings)
-        self.buttonEmployeeTable.clicked.connect(self.openEmployeeSpreadsheet)
-
-        self.buttonPingSB = QPushButton("Ping Status Bar")
-        self.buttonPingSB.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.buttonPingSB.setGeometry(0, 0, 115, 75)
-        self.buttonPingSB.setStyleSheet(buttonStyleSettings)
-        self.buttonPingSB.clicked.connect(self.pingStatusBar)
 
 
     def displayDropdownMenu(self):
@@ -121,12 +116,16 @@ class MainWindow(QMainWindow):
         """Opens login screen and redirects to admin settings upon successful login."""
         self.loginScreen = LoginScreen(1)
         self.loginScreen.show()
-        self.loginScreen.loginSuccess.connect(lambda: (self.openAdminSettings(), self.loginScreen.close()))
+        self.loginScreen.loginSuccess.connect(lambda: (self.openAdminSettings(), self.loginScreen.deleteLater()))
 
     def openAdminSettings(self):
         """Opens admin settings."""
         self.adminSettings = AdminSettingsWindow()
         self.adminSettings.show()
+
+    def openCommissionWidget(self):
+        self.commissionWidget = AddCommissionWidget()
+        self.commissionWidget.show()
 
     def openEmployeeSpreadsheet(self):
         """Opens employee spreadsheet."""
@@ -146,30 +145,104 @@ class MainWindow(QMainWindow):
         #self.conn.close()
         return employee_count
 
-    def setupScheduleTable(self):   # To-Do: displaying schedule data from DB and implementing a dynamic update if not already
-        """Configure the QTableWidget based on employee count."""
-        self.employeeCount = self.countEmployees()  # Connects to DB and displays a dynamic column count
+
+
+    def getEmployeeName(self, employeeID):
+        """Fetch the employee name based on employeeID."""
+        self.DBManager.cursor.execute("SELECT employeeName FROM employees WHERE employeeID = ?", (employeeID,))
+        return self.DBManager.cursor.fetchone()[0]
+
+    def timeToRow(self, time_str):
+        """Convert a time string (HH:MM AM/PM) to a row index."""
+        time_obj = QTime.fromString(time_str, "hh:mm AP")
+
+        if not time_obj.isValid():
+            print(f"Invalid time format detected: {time_str}")
+            return -1  # Return a safe value to avoid crashes
+
+        hour = time_obj.hour()  # Extract hour (already in 24-hour format)
+        minute = time_obj.minute()
+
+        # Ensure hours are correctly mapped to row index
+        start_hour = 8  # Your schedule starts at 8:00 AM
+        if hour < start_hour:
+            print(f"Time {time_str} is before 8:00 AM. Adjusting...")
+            return -1  # Ignore commissions before 8 AM
+
+        # Convert to row index (each row = 30-minute increment)
+        return ((hour - start_hour) * 2) + (1 if minute >= 30 else 0)
+
+
+    def setupScheduleTable(self, selected_date=None):
+        """Configure QTableWidget based on employee count & filter commissions by date."""
+        self.employeeCount = self.countEmployees()
+
+
+        # DEBUG LINE
+        print("setupScheduleTable Triggered!")
+
+
+        # Use provided date or default to today
+        if selected_date is None:
+            selected_date = QDate.currentDate().toString("yyyy-MM-dd")  # SQLite uses "YYYY-MM-DD" format
 
         # Remove old table if it exists
         if hasattr(self, 'scheduleTable'):
-            self.scheduleTable.setParent(None)  # Remove from the layout
+            self.scheduleTable.setParent(None)
 
-
-        # First parameter is # of rows. Might connect to variable for future flexibility.
         self.scheduleTable = QTableWidget(25, self.employeeCount)
 
-        # Connected to DB without closing in countEmployees(), no need to reconnect
+        # Fetch employee names
+        self.DBManager.connectToDB("employeeSchedule.db")
         self.DBManager.cursor.execute("SELECT employeeName FROM employees")
         employee_names = [row[0] for row in self.DBManager.cursor.fetchall()]
+        self.scheduleTable.setHorizontalHeaderLabels(employee_names)
 
-        self.scheduleTable.setHorizontalHeaderLabels(employee_names)  # Set column and row headers
+        # Fetch commissions filtered by date
+        self.DBManager.cursor.execute("SELECT employeeID, clientName, startTime, endTime, service FROM commissions WHERE date = ?", (selected_date,))
+        commissions = self.DBManager.cursor.fetchall()
+
         self.scheduleTable.setVerticalHeaderLabels([
             f"{12 if (hour // 2) == 12 else (hour // 2) % 12}:"
             f"{'30' if hour % 2 else '00'} "
             f"{'AM' if hour < 24 else 'PM'}"
-            for hour in range(16, 41)  # Covers 8:00 AM to 8:00 PM in 30-minute increments
+            for hour in range(16, 41)
         ])
-        self.DBManager.conn.close()
 
-        # Re-add the updated table to the layout at the bottom.
+        # Convert time to row index & add commissions
+        for employeeID, clientName, startTime, endTime, service in commissions:
+            col = employee_names.index(self.getEmployeeName(employeeID))  # Get employee's column index
+            start_row = self.timeToRow(startTime)
+            end_row = self.timeToRow(endTime)
+            duration = end_row - start_row  # Calculate duration
+
+            # Remove lead 0 for display
+            startTime = self.removeLeadZero(startTime)
+            endTime = self.removeLeadZero(endTime)
+            displayText = f"{clientName}\n{startTime} - {endTime}\n{service}"     # Info to be displayed in the cell
+            # DEBUG LINES
+            #print(f"\nEmployeeID: {employeeID}, Col Index: {col}, Service: {service}")
+            #print(f"Start Row: {start_row}, End Row: {end_row}, Duration: {duration}")
+            self.displayCommission(start_row, col, duration, displayText, QColor(173, 216, 230))  # Light blue color
+
+        self.DBManager.conn.close()
         self.main_layout.addWidget(self.scheduleTable)
+
+
+    def displayCommission(self, row, col, duration, text, color):
+        """Insert a merged, colored cell for an activity."""
+        self.scheduleTable.setSpan(row, col, duration, 1)  # Merge cells vertically
+        item = QTableWidgetItem(text)
+
+        # Apply styling
+        item.setTextAlignment(Qt.AlignCenter)  # Center the text
+        item.setBackground(color)
+        item.setFlags(item.flags() & ~Qt.ItemIsEditable)    # Disables editing the cell directly
+        item.setToolTip(text)   # Cursor hover reveals cell data that might be cutoff
+        self.scheduleTable.setItem(row, col, item)
+
+    def removeLeadZero(self, str):
+        if str.startswith("0"):
+            str = str[1:]
+        return str
+
