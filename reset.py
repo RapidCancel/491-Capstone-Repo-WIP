@@ -127,10 +127,10 @@ class EZResetWidget(QWidget):
 
         INSERT INTO commissions (employeeID, date, clientName, startTime, endTime, service)
         VALUES
-            (1, '2025-04-30', 'Cindy', '08:00', '10:00', 'Manicure'),
-            (2, '2025-04-30', 'Danielle', '09:00', '10:00', 'Pedicure'),
-            (1, '2025-04-30', 'Evelynn', '11:00', '13:30', 'Manicure GelX'),
-            (2, '2025-04-30', 'Lunch', '11:00', '13:30', 'Break');
+            (1, '2025-04-30', 'Cindy', '08:00 AM', '10:00 AM', 'Manicure'),
+            (2, '2025-04-30', 'Danielle', '09:00 AM', '10:00 AM', 'Pedicure'),
+            (1, '2025-04-30', 'Evelynn', '11:00 AM', '01:30 PM', 'Manicure, GelX'),
+            (2, '2025-04-30', 'Lunch', '11:00 AM', '01:30 PM', 'Break');
 
         INSERT INTO rolesForCommissions (commissionID, roleID)
         VALUES (1, 1), (2, 2), (3, 1), (3, 4), (4, 0);  -- manicure, pedicure, then manicure and gelx, break
