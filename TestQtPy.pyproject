@@ -8,10 +8,11 @@
         "save",
         "reset.py",
         "test.py",
-        "manualSaveTemplate.py",
-        "spreadsheetScheduleTemplate.py",
+        "test4.py",
         "test2.py",
         "employeeTable.py",
-        "test3.py"
+        "test3.py",
+        "QTimeEditTemplate.py",
+        "addCommission.py"
     ]
 }
