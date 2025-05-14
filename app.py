@@ -3,9 +3,7 @@ from PySide6.QtWidgets import QApplication
 from login import LoginScreen
 from mainWindow import MainWindow
 
-from addCommission import AddCommissionWidget
-
-from reset import EZResetWidget     # Remove EZReset after
+from reset import EZResetWidget     # Debug
 
 def onLogin():
     mainWindow.show()
@@ -16,13 +14,9 @@ if __name__ == "__main__":
     loginScreen = LoginScreen(0)
     mainWindow = MainWindow()
 
-    #addCommission = AddCommissionWidget()
-    #addCommission.show()
-
     eZReset = EZResetWidget()
     eZReset.show()
 
     loginScreen.loginSuccess.connect(onLogin)
     loginScreen.show()
-
     app.exec()
