@@ -65,6 +65,7 @@ class EZResetWidget(QWidget):
         # SQL script to reset the table, input sample login
         resetScript = """
         DROP TABLE IF EXISTS employees;
+        DROP TABLE IF EXISTS clients;
         DROP TABLE IF EXISTS jobRoles;
         DROP TABLE IF EXISTS employeeRoles;
         DROP TABLE IF EXISTS commissions;
@@ -78,6 +79,11 @@ class EZResetWidget(QWidget):
             employeeEmail TEXT,
             employeeRoles TEXT,
             employeeNotes TEXT
+        );
+
+        CREATE TABLE clients(
+            clientNumber TEXT PRIMARY KEY NOT NULL,
+            clientName TEXT NOT NULL
         );
 
         CREATE TABLE jobRoles (
@@ -97,11 +103,14 @@ class EZResetWidget(QWidget):
             commissionID INTEGER PRIMARY KEY AUTOINCREMENT,
             employeeID INTEGER,
             date DATE NOT NULL,
-            clientName TEXT NOT NULL,
+            clientNumber TEXT,
+            clientName TEXT,
             startTime TIME NOT NULL,
             endTime TIME NOT NULL,
             service TEXT,
-            FOREIGN KEY (employeeID) REFERENCES employees(employeeID)
+            price NUMERIC(6,2),
+            FOREIGN KEY (employeeID) REFERENCES employees(employeeID),
+            FOREIGN KEY (clientNumber) REFERENCES clients(clientNumber)
         );
 
         CREATE TABLE rolesForCommissions (
@@ -114,8 +123,16 @@ class EZResetWidget(QWidget):
 
 
         INSERT INTO employees (employeeID, employeeName, employeeAddress, employeePhoneNum, employeeEmail, employeeRoles, employeeNotes)
-        VALUES (1, 'Alice', '1234 N Address Ave', '6261234567', 'alice1@gmail.com', 'Manicure Pedicure Acrylic Gelx', 'Misc. Notes'),
-        (2, 'Bob', '4321 S Address Ave', '6267654321', 'bob2@yahoo.com', 'Manicure Acrylic Waxing', '');
+        VALUES
+            (1, 'Alice', '1234 N Address Ave', '6261234567', 'alice1@gmail.com', 'Manicure Pedicure Acrylic Gelx', 'Misc. Notes'),
+            (2, 'Bob', '4321 S Address Ave', '6267654321', 'bob2@yahoo.com', 'Manicure Acrylic Waxing', '');
+
+        INSERT INTO clients (clientNumber, clientName)
+        VALUES
+            ('0000000000', 'Cindy'),
+            ('1111111111', 'Danielle'),
+            ('2222222222','Evelynn');
+
 
         INSERT INTO jobRoles(roleID, roleName)
         VALUES (0, 'Break');     -- "Break" roleID == 0
@@ -125,12 +142,12 @@ class EZResetWidget(QWidget):
         INSERT INTO employeeRoles (employeeID, roleID)
         VALUES (1,0), (1, 1), (1, 2), (1, 3), (1, 4), (2, 0), (2, 1), (2, 3), (2, 5);   -- Alice can take break, manicure, pedicure, acrylic, gelx
 
-        INSERT INTO commissions (employeeID, date, clientName, startTime, endTime, service)
+        INSERT INTO commissions (employeeID, date, clientNumber, clientName, startTime, endTime, service, price)
         VALUES
-            (1, '2025-04-30', 'Cindy', '08:00 AM', '10:00 AM', 'Manicure'),
-            (2, '2025-04-30', 'Danielle', '09:00 AM', '10:00 AM', 'Pedicure'),
-            (1, '2025-04-30', 'Evelynn', '11:00 AM', '01:30 PM', 'Manicure, GelX'),
-            (2, '2025-04-30', 'Lunch', '11:00 AM', '01:30 PM', 'Break');
+            (1, '2025-05-01', '0000000000', 'Cindy', '08:00 AM', '10:00 AM', 'Manicure', 50.00),
+            (2, '2025-05-01', '1111111111', 'Danielle', '09:00 AM', '10:00 AM', 'Pedicure', 75.00),
+            (1, '2025-05-01', '2222222222', 'Evelynn', '11:00 AM', '01:30 PM', 'Manicure, GelX', 65.00),
+            (2, '2025-05-01', '', 'Lunch', '11:00 AM', '01:30 PM', 'Break', NULL);
 
         INSERT INTO rolesForCommissions (commissionID, roleID)
         VALUES (1, 1), (2, 2), (3, 1), (3, 4), (4, 0);  -- manicure, pedicure, then manicure and gelx, break
@@ -141,5 +158,13 @@ class EZResetWidget(QWidget):
         self.DBManager.editDB(resetScript, db_file = "employeeSchedule.db", script = True)
         print("Reset employeeSchedule database triggered!")
 
+if __name__ == "__main__":
+    from PySide6.QtWidgets import QApplication
+    import sys
+
+    app = QApplication(sys.argv)
+    window = EZResetWidget()
+    window.show()
+    sys.exit(app.exec())
 
 
