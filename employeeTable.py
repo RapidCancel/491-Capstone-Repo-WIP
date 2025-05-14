@@ -86,6 +86,7 @@ class EmployeeTableWindow(QWidget):
             queryValues = (employee_name, self.employeeAddress, self.employeePhoneNum, self.employeeEmail, self.employeeRoles, self.employeeNotes)
             self.DBManager.editDB(query, queryValues)
 
+
             self.refreshSpreadsheet.emit()  # Signal to update the schedule view with a new column.
             print("addEmployee query triggered!")
 
