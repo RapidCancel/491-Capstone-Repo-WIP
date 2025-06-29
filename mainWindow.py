@@ -8,7 +8,7 @@ from login import LoginScreen
 from DBManager import DatabaseManager
 from adminSettings import AdminSettingsWindow
 from employeeTable import EmployeeTableWindow
-from addCommission import AddCommissionWidget
+from commissionWidget import AddCommissionWidget
 from reset import EZResetWidget
 
 
@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.DBManager = DatabaseManager("hashedCredentials.db")
+        self.DBManager = DatabaseManager("hashedLogin.db")
         self.resetWidget = EZResetWidget()
 
         self.setWindowTitle("Main Window")
@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
     # commissionID to be fetched and passed on double-click
     def openCommissionWidget(self, commissionID = None):
         self.commissionWidget = AddCommissionWidget(commissionID)   # Pass data to AddCommissionWidget to signal an edit
-        self.commissionWidget.commissionAdded.connect(self.updateScheduleTable)     # Release signal when saved to DB, update table
+        self.commissionWidget.commissionsUpdated.connect(self.updateScheduleTable)     # Release signal when saved to DB, update table
         self.commissionWidget.show()
 
 
@@ -147,7 +147,7 @@ class MainWindow(QMainWindow):
 
     # Opens DB to fetch # of employees without closing the connection
     def countEmployees(self):
-        self.DBManager.connectToDB("employeeSchedule.db")
+        self.DBManager.connectToDB("employeeCommissions.db")
         self.DBManager.cursor.execute("SELECT COUNT(employeeID) FROM employees")
         employee_count = self.DBManager.cursor.fetchone()[0]  # Get the number of employees
         return employee_count
@@ -194,7 +194,7 @@ class MainWindow(QMainWindow):
         self.scheduleTable.itemDoubleClicked.connect(self.editCommission)
 
         # Fetch employee names
-        self.DBManager.connectToDB("employeeSchedule.db")
+        self.DBManager.connectToDB("employeeCommissions.db")
         self.DBManager.cursor.execute("SELECT employeeName FROM employees")
         employee_names = [row[0] for row in self.DBManager.cursor.fetchall()]
         self.scheduleTable.setHorizontalHeaderLabels(employee_names)
