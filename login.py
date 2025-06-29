@@ -50,11 +50,11 @@ class LoginScreen(QWidget):
     #   Switch case functions for different login needs
 
     def case0Login(self):
-        parameters = ["Login", "hashedCredentials.db"] # WindowName, FileName, Can Add other stuff later
+        parameters = ["Login", "hashedLogin.db"] # WindowName, FileName, Can Add other stuff later
         return parameters
 
     def case1Authenticate(self):
-        parameters = ["Authenticate Credentials", "hashedCredentials.db"]
+        parameters = ["Authenticate Credentials", "hashedLogin.db"]
         return parameters
 
     def loginCheck(self):       # Retrieve parameters from DB file
