@@ -7,7 +7,7 @@ class EZResetWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setGeometry(1050, 50, 200, 200)
-        self.DBManager = DatabaseManager("hashedCredentials.db")
+        self.DBManager = DatabaseManager("hashedLogin.db")
         self.init_ui()
 
     def init_ui(self):
@@ -19,7 +19,7 @@ class EZResetWidget(QWidget):
         button.clicked.connect(self.resetDatabase)
         layout.addWidget(button)
 
-        button2 = QPushButton("Reset EmployeeScheduleDB")
+        button2 = QPushButton("Reset EmployeeCommissionDB")
         button2.clicked.connect(self.resetEmployeesDB)
         layout.addWidget(button2)
 
@@ -28,15 +28,15 @@ class EZResetWidget(QWidget):
         layout.addWidget(button3)
 
         button4 = QPushButton("Print Employees")
-        button4.clicked.connect(lambda: self.DBManager.printDBTable("employees", db_file = "employeeSchedule.db"))
+        button4.clicked.connect(lambda: self.DBManager.printDBTable("employees", db_file = "employeeCommissions.db"))
         layout.addWidget(button4)
 
         button5 = QPushButton("Print Job Roles")
-        button5.clicked.connect(lambda: self.DBManager.printDBTable("jobRoles", db_file = "employeeSchedule.db"))
+        button5.clicked.connect(lambda: self.DBManager.printDBTable("jobRoles", db_file = "employeeCommissions.db"))
         layout.addWidget(button5)
 
         button6 = QPushButton("Print Commissions")
-        button6.clicked.connect(lambda: self.DBManager.printDBTable("commissions", db_file = "employeeSchedule.db"))
+        button6.clicked.connect(lambda: self.DBManager.printDBTable("commissions", db_file = "employeeCommissions.db"))
         layout.addWidget(button6)
 
         self.setLayout(layout)
@@ -72,7 +72,7 @@ class EZResetWidget(QWidget):
         DROP TABLE IF EXISTS rolesForCommissions;
 
         CREATE TABLE employees (
-            employeeID INTEGER PRIMARY KEY,
+            employeeID INTEGER PRIMARY KEY AUTOINCREMENT,
             employeeName TEXT NOT NULL,
             employeeAddress TEXT,
             employeePhoneNum TEXT,
@@ -155,8 +155,8 @@ class EZResetWidget(QWidget):
         """
 
 
-        self.DBManager.editDB(resetScript, db_file = "employeeSchedule.db", script = True)
-        print("Reset employeeSchedule database triggered!")
+        self.DBManager.editDB(resetScript, db_file = "employeeCommissions.db", script = True)
+        print("Reset employeeCommission database triggered!")
 
 if __name__ == "__main__":
     from PySide6.QtWidgets import QApplication
